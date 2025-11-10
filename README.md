@@ -16,11 +16,14 @@ INSERT layoffs_staging
 SELECT *
 FROM layoffs;
 
+--- Data didnt contain any unique ID's for the records so I needed an alternative way to identify the duplicates. For this I turned to a simple window function.
 
 SELECT *,
 ROW_NUMBER() OVER(
 PARTITION BY company, industry, total_laid_off, percentage_laid_off, 'date') AS row_num
 FROM layoffs_staging;
+
+--- My attempt to limit the coulumns i looked at left alot of repeats so i needed to partition by all columns to better narrow down to the duplicates. This is also where i found that for some odd reason there were duplicates of everything as if the data set uploaded twice
 
 WITH duplicate_cte AS 
 (
@@ -67,6 +70,7 @@ CREATE TABLE `layoffs_staging2` (
   `row_num` INT
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
+--- Created a second staging table for deleting data so that the original table remains untouched for comparison. The attached file should take you to the MySQL workbench and you can look at the original data set or i may upload it here.
 
 SELECT * FROM layoffs_staging2;
 
